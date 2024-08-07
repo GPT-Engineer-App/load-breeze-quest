@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Cat, Heart, Info, Paw, Moon, Sun, Menu, Star, Gift, Music } from "lucide-react";
+import { Cat, Heart, Info, Paw, Moon, Sun, Menu, Star, Gift, Music, Camera, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -10,13 +10,29 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const catBreeds = [
-  { name: "Siamese", description: "Vocal and social cats known for their distinctive color points.", popularity: 85 },
-  { name: "Persian", description: "Long-haired cats with a sweet, gentle nature and round faces.", popularity: 78 },
-  { name: "Maine Coon", description: "Large, friendly cats with tufted ears and long, fluffy tails.", popularity: 92 },
-  { name: "Bengal", description: "Active, playful cats with a wild appearance resembling leopards.", popularity: 88 },
-  { name: "Scottish Fold", description: "Known for their unique folded ears and owl-like appearance.", popularity: 75 },
+  { name: "Siamese", description: "Vocal and social cats known for their distinctive color points.", popularity: 85, origin: "Thailand" },
+  { name: "Persian", description: "Long-haired cats with a sweet, gentle nature and round faces.", popularity: 78, origin: "Iran" },
+  { name: "Maine Coon", description: "Large, friendly cats with tufted ears and long, fluffy tails.", popularity: 92, origin: "United States" },
+  { name: "Bengal", description: "Active, playful cats with a wild appearance resembling leopards.", popularity: 88, origin: "United States" },
+  { name: "Scottish Fold", description: "Known for their unique folded ears and owl-like appearance.", popularity: 75, origin: "Scotland" },
+  { name: "Sphynx", description: "Hairless cats known for their wrinkled skin and extroverted personality.", popularity: 70, origin: "Canada" },
+  { name: "Russian Blue", description: "Elegant cats with a silvery-blue coat and green eyes.", popularity: 82, origin: "Russia" },
+];
+
+const catPopularityData = [
+  { year: 2018, popularity: 65 },
+  { year: 2019, popularity: 72 },
+  { year: 2020, popularity: 80 },
+  { year: 2021, popularity: 85 },
+  { year: 2022, popularity: 90 },
+  { year: 2023, popularity: 95 },
 ];
 
 const catFacts = [
@@ -51,6 +67,9 @@ const Index = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [catLevel, setCatLevel] = useState(0);
   const [selectedSound, setSelectedSound] = useState(null);
+  const [userCatName, setUserCatName] = useState("");
+  const [showNameAlert, setShowNameAlert] = useState(false);
+  const [isPhotoBoothOpen, setIsPhotoBoothOpen] = useState(false);
 
   useEffect(() => {
     if (darkMode) {
@@ -80,6 +99,7 @@ const Index = () => {
 
   return (
     <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gradient-to-br from-purple-100 via-pink-100 to-yellow-100'} transition-colors duration-300`}>
+      <div className="fixed top-0 left-0 w-full h-2 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500"></div>
       <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
         <SheetTrigger asChild>
           <Button variant="outline" size="icon" className="fixed top-4 left-4 z-50">
@@ -110,12 +130,26 @@ const Index = () => {
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-12"
+          className="text-center mb-12 relative"
         >
           <h1 className="text-6xl font-bold mb-4 text-purple-800 flex items-center justify-center">
             <Cat className="mr-4 text-pink-600" size={64} /> Feline Fascination
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300">Discover the Wonderful World of Cats</p>
+          <motion.div
+            className="absolute -top-6 -left-6 text-yellow-400"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          >
+            <Sparkles size={32} />
+          </motion.div>
+          <motion.div
+            className="absolute -bottom-6 -right-6 text-yellow-400"
+            animate={{ rotate: -360 }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          >
+            <Sparkles size={32} />
+          </motion.div>
         </motion.div>
 
         <Carousel className="mb-12">
@@ -160,6 +194,84 @@ const Index = () => {
                 Level Up! <Gift className="ml-2" />
               </Button>
             </div>
+          </CardContent>
+        </Card>
+
+        <Card className="mb-12">
+          <CardHeader>
+            <CardTitle className="text-2xl font-semibold flex items-center">
+              <Camera className="mr-2 text-blue-500" /> Cat Photo Booth
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="mb-4">Capture and share adorable moments with your feline friend!</p>
+            <Dialog open={isPhotoBoothOpen} onOpenChange={setIsPhotoBoothOpen}>
+              <DialogTrigger asChild>
+                <Button className="w-full">Open Photo Booth</Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Cat Photo Booth</DialogTitle>
+                  <DialogDescription>
+                    Take a picture with your cat or upload a cute cat photo!
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="flex flex-col items-center space-y-4">
+                  <div className="w-64 h-64 bg-gray-200 rounded-lg flex items-center justify-center">
+                    <Camera size={48} className="text-gray-400" />
+                  </div>
+                  <Button>Take Photo</Button>
+                  <Button variant="outline">Upload Photo</Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </CardContent>
+        </Card>
+
+        <Card className="mb-12">
+          <CardHeader>
+            <CardTitle className="text-2xl font-semibold">Name Your Cat</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex space-x-4">
+              <div className="flex-grow">
+                <Label htmlFor="catName">Your Cat's Name</Label>
+                <Input
+                  id="catName"
+                  placeholder="Enter your cat's name"
+                  value={userCatName}
+                  onChange={(e) => setUserCatName(e.target.value)}
+                />
+              </div>
+              <Button
+                className="mt-8"
+                onClick={() => {
+                  if (userCatName) {
+                    setShowNameAlert(true);
+                    setTimeout(() => setShowNameAlert(false), 3000);
+                  }
+                }}
+              >
+                Save Name
+              </Button>
+            </div>
+            <AnimatePresence>
+              {showNameAlert && (
+                <motion.div
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Alert className="mt-4">
+                    <AlertTitle>Success!</AlertTitle>
+                    <AlertDescription>
+                      Your cat's name has been set to {userCatName}.
+                    </AlertDescription>
+                  </Alert>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </CardContent>
         </Card>
 
@@ -210,9 +322,10 @@ const Index = () => {
         </Card>
 
         <Tabs defaultValue="characteristics" className="mb-12">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="characteristics">Characteristics</TabsTrigger>
             <TabsTrigger value="breeds">Popular Breeds</TabsTrigger>
+            <TabsTrigger value="popularity">Cat Popularity</TabsTrigger>
           </TabsList>
           <TabsContent value="characteristics" id="characteristics">
             <Card>
@@ -271,15 +384,38 @@ const Index = () => {
                       >
                         <h3 className="font-semibold text-xl mb-2">{breed.name}</h3>
                         <p className={`mb-3 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{breed.description}</p>
-                        <div className="flex items-center">
+                        <div className="flex items-center mb-2">
                           <span className="mr-2">Popularity:</span>
                           <Progress value={breed.popularity} className="w-1/2" />
                           <span className="ml-2">{breed.popularity}%</span>
                         </div>
+                        <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Origin: {breed.origin}</p>
                       </motion.li>
                     ))}
                   </ul>
                 </ScrollArea>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="popularity" id="popularity">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-2xl">Cat Popularity Trend</CardTitle>
+                <CardDescription>See how cat popularity has changed over the years</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[400px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={catPopularityData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="year" />
+                      <YAxis />
+                      <RechartsTooltip />
+                      <Legend />
+                      <Line type="monotone" dataKey="popularity" stroke="#8884d8" activeDot={{ r: 8 }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
